@@ -1,0 +1,5 @@
+[tool.cibuildwheel]
+before-all = "python setup.py fetch --all"
+before-build = "python setup.py build --enable-all-extensions"
+skip = "pp*"
+test-command = "python {package}/tests.py"

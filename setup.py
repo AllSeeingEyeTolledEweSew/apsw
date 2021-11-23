@@ -230,7 +230,7 @@ fetch_parts = []
 class fetch(Command):
     description = "Automatically downloads SQLite and components"
     user_options = [
-        ("version=", None, "Which version of SQLite/components to get (default current)"),
+        ("version=", None, "Which version of SQLite/components to get (default matched)"),
         ("missing-checksum-ok", None, "Continue on a missing checksum (default abort)"),
         ("sqlite", None, "Download SQLite amalgamation"),
         ("all", None, "Download all downloadable components"),
@@ -239,7 +239,7 @@ class fetch(Command):
     boolean_options = fetch_options + ['all', 'missing-checksum-ok']
 
     def initialize_options(self):
-        self.version = None
+        self.version = "matched"
         self.sqlite = False
         self.all = False
         self.missing_checksum_ok = False
@@ -255,7 +255,10 @@ class fetch(Command):
 
     def run(self):
         # work out the version
-        if self.version is None:
+        if self.version == "matched":
+            self.version = "3.36.0"
+
+        if self.version == "latest":
             write("  Getting download page to work out current SQLite version")
             page = self.download("https://sqlite.org/download.html", text=True, checksum=False)
             match = re.search(r'sqlite-amalgamation-3([0-9][0-9])([0-9][0-9])([0-9][0-9])\.zip', page)
@@ -268,6 +271,7 @@ class fetch(Command):
                 write("to set version - eg setup.py fetch --version=3.6.18", sys.stderr)
                 sys.exit(17)
             write("    Version is " + self.version)
+
         # now get each selected component
         downloaded = 0
 
