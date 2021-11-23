@@ -1,0 +1,24 @@
+[project]
+requires-python = ">=3.6"
+
+[tool.cibuildwheel]
+before-all = "python3 setup.py configure_pinned"
+skip = "pp*"
+test-command = "python {package}/tests.py"
+
+[tool.cibuildwheel.macos.environment]
+PKG_CONFIG_PATH = "/usr/local/opt/icu4c/lib/pkgconfig"  # icu4c preinstalled on GHA, but brew will not symlink
+
+[[tool.cibuildwheel.overrides]]
+before-all = [
+    "python3 setup.py configure_pinned",
+    "yum install -y libicu-devel",
+]
+select = "*-manylinux_*"
+
+[[tool.cibuildwheel.overrides]]
+before-all = [
+    "python3 setup.py configure_pinned",
+    "apk add icu-dev",
+]
+select = "*-musllinux_*"
